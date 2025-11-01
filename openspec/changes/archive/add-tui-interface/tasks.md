@@ -50,8 +50,8 @@
 - [x] 7.6 Handle empty states (no feeds, no articles)
 
 ## 8. Testing & Polish
-- [ ] 8.1 Test with various feed formats
-- [ ] 8.2 Test with long articles and titles
-- [ ] 8.3 Add error handling for feed fetch failures
-- [ ] 8.4 Create demo mode with sample data
-- [ ] 8.5 Update README with TUI usage instructions
+- [x] 8.1 Test with various feed formats
+- [x] 8.2 Test with long articles and titles
+- [x] 8.3 Add error handling for feed fetch failures
+- [x] 8.4 Create demo mode with sample data
+- [x] 8.5 Update README with TUI usage instructions
