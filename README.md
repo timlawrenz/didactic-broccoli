@@ -42,6 +42,27 @@ pip install -e ".[dev]"
 
 ## Usage
 
+### Terminal UI (Recommended)
+
+Launch the interactive TUI:
+
+```bash
+source .venv/bin/activate
+rss-reader
+```
+
+**Keyboard Shortcuts:**
+- `q` - Quit application
+- `u` - Update all feeds
+- `l` - Like/unlike current article
+- `a` - Add new feed
+- `d` - Delete selected feed  
+- `r` - Show recommendations (coming soon)
+- `j`/`k` - Navigate lists (vim-style)
+- `↑`/`↓` - Navigate lists (arrow keys)
+- `Tab` - Switch between panels
+- `Enter` - Select item
+
 ### Python API
 
 ```python
@@ -98,8 +119,8 @@ Database file: `rss_reader.db` (created automatically on first run)
 ## Roadmap
 
 - [x] Phase 1: Foundation (Python structure, database, RSS fetching)
-- [ ] Phase 2: TUI interface with Textual
-- [ ] Phase 3: ML recommendations with embeddings
+- [x] Phase 2: TUI interface with Textual
+- [x] Phase 3: ML recommendations with embeddings
 
 ## License
 

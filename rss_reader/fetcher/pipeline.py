@@ -10,11 +10,12 @@ from .article_extractor import extract_article_text
 logger = logging.getLogger(__name__)
 
 
-def fetch_and_store_feed(feed_id: int) -> int:
+def fetch_and_store_feed(feed_id: int, generate_embeddings: bool = True) -> int:
     """Fetch RSS feed and store articles in database.
     
     Args:
         feed_id: Feed ID to fetch
+        generate_embeddings: Whether to generate ML embeddings (default True)
         
     Returns:
         Number of new articles added
@@ -57,6 +58,28 @@ def fetch_and_store_feed(feed_id: int) -> int:
         if article_id:
             new_count += 1
             logger.debug(f"Added article: {article_data['title']}")
+            
+            # Generate and store embedding for new article
+            if generate_embeddings:
+                try:
+                    from ..ml import generate_article_embedding, store_embedding
+                    
+                    article = {
+                        'title': article_data['title'],
+                        'summary': article_data['summary'],
+                        'full_text': full_text
+                    }
+                    
+                    embedding = generate_article_embedding(article)
+                    if embedding is not None:
+                        store_embedding(article_id, embedding)
+                        logger.debug(f"Generated embedding for article {article_id}")
+                    else:
+                        logger.warning(f"Failed to generate embedding for article {article_id}")
+                        
+                except Exception as e:
+                    logger.warning(f"Error generating embedding for article {article_id}: {e}")
+                    # Continue processing other articles
         else:
             logger.debug(f"Skipped duplicate article: {article_data['title']}")
     

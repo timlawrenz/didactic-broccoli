@@ -38,6 +38,14 @@ CREATE TABLE IF NOT EXISTS user_likes (
     FOREIGN KEY (article_id) REFERENCES articles(article_id) ON DELETE CASCADE
 );
 
+-- Embeddings table for ML recommendations
+CREATE TABLE IF NOT EXISTS embeddings (
+    article_id INTEGER PRIMARY KEY,
+    embedding BLOB NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (article_id) REFERENCES articles(article_id) ON DELETE CASCADE
+);
+
 -- Indexes for common queries
 CREATE INDEX IF NOT EXISTS idx_articles_feed_id ON articles(feed_id);
 CREATE INDEX IF NOT EXISTS idx_articles_published_date ON articles(published_date DESC);
