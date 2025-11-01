@@ -1,0 +1,23 @@
+"""Sample RSS feed for testing."""
+
+SAMPLE_RSS = """<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>Test Feed</title>
+    <link>https://example.com</link>
+    <description>A test RSS feed</description>
+    <item>
+      <title>Test Article 1</title>
+      <link>https://example.com/article1</link>
+      <description>This is a test article</description>
+      <pubDate>Mon, 01 Jan 2024 12:00:00 GMT</pubDate>
+    </item>
+    <item>
+      <title>Test Article 2</title>
+      <link>https://example.com/article2</link>
+      <description>Another test article</description>
+      <pubDate>Tue, 02 Jan 2024 12:00:00 GMT</pubDate>
+    </item>
+  </channel>
+</rss>
+"""
