@@ -48,3 +48,14 @@ INFO: Generated 5 taste centroids
 INFO: Using 5 taste centroids for recommendations
 INFO: Generated 20 recommendations
 INFO: Generated 20 recommendations
+INFO: RSS Reader TUI started
+INFO: _load_initial_data called
+INFO: Found feed_list widget: FeedList(id='feed-list')
+INFO: load_feeds: Starting
+INFO: load_feeds: Found container: VerticalScroll(id='feed-container')
+INFO: load_feeds: Got 2 feeds from database
+INFO: load_feeds: Creating FeedItem for 9to5google with 25 articles
+INFO: load_feeds: Creating FeedItem for Ars Technica with 20 articles
+INFO: load_feeds: Successfully mounted 2 feeds
+INFO: Container now has 2 children
+INFO: load_feeds() called successfully

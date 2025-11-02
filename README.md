@@ -8,7 +8,8 @@ A personalized RSS reader with ML-powered recommendations running in your termin
 - Automatically fetch and extract full article text
 - Store articles locally in SQLite database
 - Like articles to build your preference profile
-- *Coming soon:* ML-based article recommendations
+- **ML-powered recommendations** based on your reading preferences
+- Interactive terminal UI with keyboard navigation
 
 ## Installation
 
@@ -57,11 +58,30 @@ rss-reader
 - `l` - Like/unlike current article
 - `a` - Add new feed
 - `d` - Delete selected feed  
-- `r` - Show recommendations (coming soon)
+- `r` - Show personalized recommendations
 - `j`/`k` - Navigate lists (vim-style)
 - `↑`/`↓` - Navigate lists (arrow keys)
 - `Tab` - Switch between panels
 - `Enter` - Select item
+
+### ML-Powered Recommendations
+
+The RSS reader learns your preferences as you like articles and provides personalized recommendations:
+
+1. **Like articles** (press `l`) that interest you
+2. After liking **5 or more articles**, press `r` to see recommendations
+3. The system uses:
+   - **Sentence embeddings** (all-MiniLM-L6-v2 model) to understand article content
+   - **K-Means clustering** to identify your diverse interests
+   - **Cosine similarity** to find articles similar to your taste profile
+
+**How it works:**
+- Embeddings are generated automatically when fetching new articles
+- Your liked articles are clustered into 5 taste profiles
+- Recommendations are ranked by similarity to your interests
+- Already-read articles are excluded
+
+**Note:** The first time you update feeds, the sentence-transformers model (~80MB) will be downloaded automatically.
 
 ### Python API
 
@@ -102,17 +122,18 @@ pytest --cov=rss_reader --cov-report=html
 rss_reader/
 ├── db/              # Database layer (SQLite)
 ├── fetcher/         # RSS fetching and article extraction
-├── ml/              # ML embeddings and recommendations (coming soon)
-└── ui/              # TUI interface (coming soon)
+├── ml/              # ML embeddings and recommendations
+└── ui/              # TUI interface with Textual
 ```
 
 ## Database Schema
 
-The application uses SQLite with three main tables:
+The application uses SQLite with four main tables:
 
 - **feeds**: Subscribed RSS feeds
 - **articles**: Fetched articles with full text
 - **user_likes**: User's liked articles
+- **embeddings**: 384-dimensional article embeddings for ML
 
 Database file: `rss_reader.db` (created automatically on first run)
 
