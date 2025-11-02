@@ -165,6 +165,11 @@ class RSSReaderApp(App):
             logger.info(f"Found feed_list widget: {feed_list}")
             feed_list.load_feeds()
             logger.info("load_feeds() called successfully")
+            
+            # Load "All Articles" by default
+            article_list = self.query_one("#article-list", ArticleList)
+            article_list.load_articles(0)  # 0 = All Articles
+            logger.info("Loaded All Articles by default")
         except Exception as e:
             logger.error(f"Error in _load_initial_data: {e}", exc_info=True)
     

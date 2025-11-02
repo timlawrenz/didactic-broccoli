@@ -7,7 +7,7 @@ from textual.containers import VerticalScroll, Vertical
 from textual.message import Message
 from textual.reactive import reactive
 
-from ...db import get_all_feeds, get_articles_by_feed
+from ...db import get_all_feeds, get_articles_by_feed, get_all_articles_sorted
 
 
 logger = logging.getLogger(__name__)
@@ -29,14 +29,18 @@ class FeedItem(Static):
     }
     """
     
-    def __init__(self, feed_id: int, feed_name: str, article_count: int):
+    def __init__(self, feed_id: int, feed_name: str, article_count: int, is_all_articles: bool = False):
         super().__init__()
         self.feed_id = feed_id
         self.feed_name = feed_name
         self.article_count = article_count
+        self.is_all_articles = is_all_articles
     
     def render(self) -> str:
         """Render the feed item."""
+        if self.is_all_articles:
+            # Bold/highlighted for "All Articles"
+            return f"[bold]📰 {self.feed_name}[/bold] [dim]({self.article_count})[/dim]"
         return f"{self.feed_name} [dim]({self.article_count})[/dim]"
     
     async def on_click(self) -> None:
@@ -88,31 +92,45 @@ class FeedList(Vertical):
             container.remove_children()
             
             feeds = get_all_feeds()
-            
             logger.info(f"load_feeds: Got {len(feeds)} feeds from database")
             
-            if not feeds:
-                container.mount(Label("[dim]No feeds yet. Press 'a' to add one.[/dim]"))
-                logger.info("Mounted 'no feeds' message")
-                return
+            # Calculate total article count across all feeds
+            total_count = 0
+            feed_counts = {}
             
-            # Mount each feed item
-            items = []
             for feed in feeds:
-                # Get article count for this feed
                 articles = get_articles_by_feed(feed['feed_id'], limit=1000)
                 count = len(articles)
-                
+                feed_counts[feed['feed_id']] = count
+                total_count += count
+            
+            # Add "All Articles" as first item
+            items = []
+            all_articles_item = FeedItem(0, "All Articles", total_count, is_all_articles=True)
+            items.append(all_articles_item)
+            
+            logger.info(f"load_feeds: Added 'All Articles' with {total_count} total articles")
+            
+            if not feeds:
+                # Still show "All Articles" even with no feeds
+                container.mount(*items)
+                logger.info("Mounted only 'All Articles' (no feeds)")
+                return
+            
+            # Add separator
+            items.append(Label("[dim]─────────────────[/dim]"))
+            
+            # Mount each feed item
+            for feed in feeds:
+                count = feed_counts[feed['feed_id']]
                 logger.info(f"load_feeds: Creating FeedItem for {feed['name']} with {count} articles")
-                
                 item = FeedItem(feed['feed_id'], feed['name'], count)
                 items.append(item)
             
             # Mount all items at once
             container.mount(*items)
             
-            logger.info(f"load_feeds: Successfully mounted {len(feeds)} feeds")
-            logger.info(f"Container now has {len(container.children)} children")
+            logger.info(f"load_feeds: Successfully mounted {len(items)} items")
         except Exception as e:
             logger.error(f"load_feeds: Error - {e}", exc_info=True)
     

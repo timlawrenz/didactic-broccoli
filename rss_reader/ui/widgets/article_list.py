@@ -5,7 +5,7 @@ from textual.widgets import Static, ListView, ListItem, Label
 from textual.message import Message
 from textual.reactive import reactive
 
-from ...db import get_articles_by_feed, get_liked_articles
+from ...db import get_articles_by_feed, get_all_articles_sorted, get_liked_articles
 
 
 class ArticleList(Static):
@@ -33,7 +33,11 @@ class ArticleList(Static):
         listview = self.query_one("#article-listview", ListView)
         listview.clear()
         
-        articles = get_articles_by_feed(feed_id, limit=100)
+        # Check if this is "All Articles" (feed_id == 0)
+        if feed_id == 0:
+            articles = get_all_articles_sorted(limit=100)
+        else:
+            articles = get_articles_by_feed(feed_id, limit=100)
         
         if not articles:
             listview.append(ListItem(Label("[dim]No articles yet. Press 'u' to fetch.[/dim]")))
@@ -50,7 +54,13 @@ class ArticleList(Static):
             if article['published_date']:
                 date_str = f" [dim]{article['published_date'][:10]}[/dim]"
             
-            label = Label(f"{heart}{article['title']}{date_str}")
+            # Add feed name prefix for "All Articles" view
+            if feed_id == 0 and 'feed_name' in article:
+                title = f"[cyan]{article['feed_name']}[/cyan] {article['title']}"
+            else:
+                title = article['title']
+            
+            label = Label(f"{heart}{title}{date_str}")
             item = ListItem(label)
             item.article_id = article['article_id']
             item.article_data = dict(article)

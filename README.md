@@ -52,6 +52,12 @@ source .venv/bin/activate
 rss-reader
 ```
 
+**Browsing Articles:**
+- The app starts with **"All Articles"** view showing posts from all feeds chronologically
+- Click on "All Articles" or a specific feed name in the left sidebar to switch views
+- In "All Articles" view, each article is prefixed with its feed name (e.g., "[Tech News] Article Title")
+- Navigate with arrow keys or vim-style `j`/`k` keys
+
 **Keyboard Shortcuts:**
 - `q` - Quit application
 - `u` - Update all feeds

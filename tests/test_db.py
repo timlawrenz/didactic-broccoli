@@ -115,6 +115,75 @@ class TestArticles:
         
         article = models.get_article(article_id)
         assert article is None
+    
+    def test_get_all_articles_sorted(self, db):
+        """Test getting all articles from all feeds sorted by date."""
+        # Create two feeds
+        feed1_id = models.add_feed("https://example.com/feed1", "Tech News")
+        feed2_id = models.add_feed("https://example.com/feed2", "Science News")
+        
+        # Add articles with different dates
+        models.add_article(
+            feed1_id, "Old Article", "https://example.com/1",
+            published_date=datetime(2024, 1, 1)
+        )
+        models.add_article(
+            feed2_id, "Recent Article", "https://example.com/2",
+            published_date=datetime(2024, 1, 3)
+        )
+        models.add_article(
+            feed1_id, "Middle Article", "https://example.com/3",
+            published_date=datetime(2024, 1, 2)
+        )
+        
+        # Get all articles
+        articles = models.get_all_articles_sorted()
+        
+        # Should be sorted newest first
+        assert len(articles) == 3
+        assert articles[0]['title'] == "Recent Article"
+        assert articles[0]['feed_name'] == "Science News"
+        assert articles[1]['title'] == "Middle Article"
+        assert articles[2]['title'] == "Old Article"
+    
+    def test_get_all_articles_sorted_with_limit(self, db):
+        """Test getting limited number of articles."""
+        feed_id = models.add_feed("https://example.com/feed", "Test Feed")
+        
+        for i in range(5):
+            models.add_article(
+                feed_id, f"Article {i}", f"https://example.com/{i}",
+                published_date=datetime(2024, 1, i+1)
+            )
+        
+        articles = models.get_all_articles_sorted(limit=3)
+        assert len(articles) == 3
+        # Should get 3 newest
+        assert articles[0]['title'] == "Article 4"
+    
+    def test_get_all_articles_sorted_empty(self, db):
+        """Test getting articles when none exist."""
+        articles = models.get_all_articles_sorted()
+        assert len(articles) == 0
+    
+    def test_get_all_articles_sorted_same_date(self, db):
+        """Test articles with same date are sorted by feed name then title."""
+        feed1_id = models.add_feed("https://example.com/b", "B Feed")
+        feed2_id = models.add_feed("https://example.com/a", "A Feed")
+        
+        same_date = datetime(2024, 1, 1)
+        
+        models.add_article(feed1_id, "Z Article", "https://example.com/1", published_date=same_date)
+        models.add_article(feed2_id, "Y Article", "https://example.com/2", published_date=same_date)
+        models.add_article(feed1_id, "A Article", "https://example.com/3", published_date=same_date)
+        
+        articles = models.get_all_articles_sorted()
+        
+        # Same date: sorted by feed name (A Feed before B Feed), then title
+        assert articles[0]['feed_name'] == "A Feed"
+        assert articles[1]['feed_name'] == "B Feed"
+        assert articles[1]['title'] == "A Article"  # A before Z in B Feed
+        assert articles[2]['title'] == "Z Article"
 
 
 class TestUserLikes:

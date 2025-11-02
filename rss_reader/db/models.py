@@ -165,6 +165,39 @@ def get_articles_by_feed(feed_id: int, limit: int = 100) -> list[sqlite3.Row]:
     return cursor.fetchall()
 
 
+def get_all_articles_sorted(limit: Optional[int] = None) -> list[sqlite3.Row]:
+    """Get all articles from all feeds, sorted by published date (newest first).
+    
+    Args:
+        limit: Optional maximum number of articles to return
+        
+    Returns:
+        List of article rows with feed_name included
+    """
+    conn = get_connection()
+    query = """
+        SELECT 
+            a.article_id,
+            a.feed_id,
+            a.title,
+            a.link,
+            a.summary,
+            a.full_text,
+            a.published_date,
+            a.fetched_at,
+            f.name as feed_name
+        FROM articles a
+        JOIN feeds f ON a.feed_id = f.feed_id
+        ORDER BY a.published_date DESC, f.name ASC, a.title ASC
+    """
+    
+    if limit:
+        query += f" LIMIT {limit}"
+    
+    cursor = conn.execute(query)
+    return cursor.fetchall()
+
+
 # User interaction operations
 
 def like_article(article_id: int, user_id: int = 1) -> None:
