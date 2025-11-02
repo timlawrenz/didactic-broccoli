@@ -2,7 +2,7 @@
 
 from textual.app import ComposeResult
 from textual.widgets import Static, Label
-from textual.containers import Container, VerticalScroll
+from textual.containers import VerticalScroll
 from textual.reactive import reactive
 
 from ...db import get_liked_articles
@@ -11,14 +11,34 @@ from ...db import get_liked_articles
 class ArticleReader(Static):
     """Widget displaying full article content."""
     
+    DEFAULT_CSS = """
+    ArticleReader {
+        width: 100%;
+        height: 100%;
+    }
+    
+    #reader-container {
+        width: 100%;
+        height: 1fr;
+        overflow-x: hidden;
+        overflow-y: auto;
+    }
+    
+    #reader-content {
+        width: 100%;
+        height: auto;
+        padding: 1;
+    }
+    """
+    
     current_article_id: reactive[int | None] = reactive(None)
     current_article: reactive[dict | None] = reactive(None)
     
     def compose(self) -> ComposeResult:
         """Create child widgets."""
         yield Label("📖 Reader", id="reader-header")
-        yield Container(
-            Label("[dim]Select an article to read[/dim]", id="reader-content"),
+        yield VerticalScroll(
+            Static("[dim]Select an article to read[/dim]", id="reader-content"),
             id="reader-container"
         )
     
@@ -49,7 +69,7 @@ class ArticleReader(Static):
 """
         
         # Update reader content
-        reader_content = self.query_one("#reader-content", Label)
+        reader_content = self.query_one("#reader-content", Static)
         reader_content.update(content)
     
     def refresh_article(self) -> None:
