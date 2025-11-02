@@ -6,6 +6,7 @@ from textual.message import Message
 from textual.reactive import reactive
 
 from ...db import get_articles_by_feed, get_all_articles_sorted, get_liked_articles
+from ...ml import get_recommendations
 
 
 class ArticleList(Static):
@@ -36,6 +37,30 @@ class ArticleList(Static):
         # Check if this is "All Articles" (feed_id == 0)
         if feed_id == 0:
             articles = get_all_articles_sorted(limit=100)
+        elif feed_id == -1:
+            # Recommended feed
+            liked_count = len(get_liked_articles())
+            if liked_count < 5:
+                listview.append(ListItem(Label(
+                    f"[dim]Like at least 5 articles to see recommendations (you have {liked_count})[/dim]\n\n"
+                    f"[dim]Try browsing 'All Articles' and liking content that interests you![/dim]"
+                )))
+                return
+            
+            try:
+                articles = get_recommendations(limit=50)
+                if not articles:
+                    listview.append(ListItem(Label(
+                        "[dim]No recommendations available[/dim]\n\n"
+                        "[dim]Try adding more feeds or liking more articles.[/dim]"
+                    )))
+                    return
+            except Exception as e:
+                listview.append(ListItem(Label(
+                    "[dim]Recommendations temporarily unavailable[/dim]\n\n"
+                    f"[dim]Error: {e}[/dim]"
+                )))
+                return
         else:
             articles = get_articles_by_feed(feed_id, limit=100)
         
@@ -54,13 +79,19 @@ class ArticleList(Static):
             if article['published_date']:
                 date_str = f" [dim]{article['published_date'][:10]}[/dim]"
             
-            # Add feed name prefix for "All Articles" view
-            if feed_id == 0 and 'feed_name' in article:
+            # Add feed name prefix for "All Articles" and "Recommended" views
+            if (feed_id == 0 or feed_id == -1) and 'feed_name' in article:
                 title = f"[cyan]{article['feed_name']}[/cyan] {article['title']}"
             else:
                 title = article['title']
             
-            label = Label(f"{heart}{title}{date_str}")
+            # Add similarity score for recommendations (optional)
+            score_str = ""
+            if feed_id == -1 and 'similarity_score' in article:
+                score_pct = int(article['similarity_score'] * 100)
+                score_str = f" [dim]({score_pct}%)[/dim]"
+            
+            label = Label(f"{heart}{title}{date_str}{score_str}")
             item = ListItem(label)
             item.article_id = article['article_id']
             item.article_data = dict(article)

@@ -7,7 +7,8 @@ from textual.containers import VerticalScroll, Vertical
 from textual.message import Message
 from textual.reactive import reactive
 
-from ...db import get_all_feeds, get_articles_by_feed, get_all_articles_sorted
+from ...db import get_all_feeds, get_articles_by_feed, get_all_articles_sorted, get_liked_articles
+from ...ml import get_recommendations
 
 
 logger = logging.getLogger(__name__)
@@ -29,18 +30,24 @@ class FeedItem(Static):
     }
     """
     
-    def __init__(self, feed_id: int, feed_name: str, article_count: int, is_all_articles: bool = False):
+    def __init__(self, feed_id: int, feed_name: str, article_count: int, is_all_articles: bool = False, is_recommended: bool = False):
         super().__init__()
         self.feed_id = feed_id
         self.feed_name = feed_name
         self.article_count = article_count
         self.is_all_articles = is_all_articles
+        self.is_recommended = is_recommended
     
     def render(self) -> str:
         """Render the feed item."""
         if self.is_all_articles:
             # Bold/highlighted for "All Articles"
             return f"[bold]📰 {self.feed_name}[/bold] [dim]({self.article_count})[/dim]"
+        if self.is_recommended:
+            # Bold/highlighted for "Recommended"
+            if self.article_count == 0:
+                return f"[bold dim]✨ {self.feed_name}[/bold dim] [dim](0)[/dim]"
+            return f"[bold]✨ {self.feed_name}[/bold] [dim]({self.article_count})[/dim]"
         return f"{self.feed_name} [dim]({self.article_count})[/dim]"
     
     async def on_click(self) -> None:
@@ -111,10 +118,26 @@ class FeedList(Vertical):
             
             logger.info(f"load_feeds: Added 'All Articles' with {total_count} total articles")
             
+            # Add "Recommended" feed
+            liked_count = len(get_liked_articles())
+            if liked_count >= 5:
+                try:
+                    recommendations = get_recommendations(limit=50)
+                    rec_count = len(recommendations)
+                except Exception as e:
+                    logger.warning(f"Failed to get recommendations: {e}")
+                    rec_count = 0
+            else:
+                rec_count = 0
+            
+            recommended_item = FeedItem(-1, "Recommended", rec_count, is_recommended=True)
+            items.append(recommended_item)
+            logger.info(f"load_feeds: Added 'Recommended' with {rec_count} recommendations")
+            
             if not feeds:
-                # Still show "All Articles" even with no feeds
+                # Still show virtual feeds even with no real feeds
                 container.mount(*items)
-                logger.info("Mounted only 'All Articles' (no feeds)")
+                logger.info("Mounted only virtual feeds (no real feeds)")
                 return
             
             # Add separator

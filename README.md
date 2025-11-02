@@ -54,8 +54,9 @@ rss-reader
 
 **Browsing Articles:**
 - The app starts with **"All Articles"** view showing posts from all feeds chronologically
-- Click on "All Articles" or a specific feed name in the left sidebar to switch views
-- In "All Articles" view, each article is prefixed with its feed name (e.g., "[Tech News] Article Title")
+- Below that is **"Recommended"** - your personalized ML-powered article suggestions
+- Click on any feed name in the left sidebar to switch views
+- In "All Articles" and "Recommended" views, each article is prefixed with its feed name
 - Navigate with arrow keys or vim-style `j`/`k` keys
 
 **Keyboard Shortcuts:**
@@ -63,8 +64,7 @@ rss-reader
 - `u` - Update all feeds
 - `l` - Like/unlike current article
 - `a` - Add new feed
-- `d` - Delete selected feed  
-- `r` - Show personalized recommendations
+- `d` - Delete selected feed
 - `j`/`k` - Navigate lists (vim-style)
 - `↑`/`↓` - Navigate lists (arrow keys)
 - `Tab` - Switch between panels
@@ -75,8 +75,9 @@ rss-reader
 The RSS reader learns your preferences as you like articles and provides personalized recommendations:
 
 1. **Like articles** (press `l`) that interest you
-2. After liking **5 or more articles**, press `r` to see recommendations
-3. The system uses:
+2. After liking **5 or more articles**, the **"Recommended"** feed in the sidebar will show available recommendations
+3. Click on **"Recommended"** to browse personalized article suggestions
+4. The system uses:
    - **Sentence embeddings** (all-MiniLM-L6-v2 model) to understand article content
    - **K-Means clustering** to identify your diverse interests
    - **Cosine similarity** to find articles similar to your taste profile
@@ -84,8 +85,9 @@ The RSS reader learns your preferences as you like articles and provides persona
 **How it works:**
 - Embeddings are generated automatically when fetching new articles
 - Your liked articles are clustered into 5 taste profiles
-- Recommendations are ranked by similarity to your interests
-- Already-read articles are excluded
+- Recommendations are ranked by similarity score (shown as percentages)
+- Articles are sorted by relevance (highest match first)
+- Already-liked articles are excluded from recommendations
 
 **Note:** The first time you update feeds, the sentence-transformers model (~80MB) will be downloaded automatically.
 
