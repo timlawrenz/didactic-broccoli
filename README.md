@@ -36,9 +36,23 @@ source .venv/bin/activate  # On Windows: .venv\Scripts\activate
 pip install -e .
 ```
 
-4. Install development dependencies (optional):
+4. Install optional dependencies:
 ```bash
+# Development tools
 pip install -e ".[dev]"
+
+# Tavily API for enhanced article extraction (optional)
+pip install -e ".[tavily]"
+```
+
+5. Configure Tavily API (optional):
+```bash
+# Create .env file
+cp .env.example .env
+
+# Edit .env and add your Tavily API key
+# Get a free API key from: https://tavily.com
+TAVILY_API_KEY=tvly-your-api-key-here
 ```
 
 ## Usage
@@ -90,6 +104,27 @@ The RSS reader learns your preferences as you like articles and provides persona
 - Already-liked articles are excluded from recommendations
 
 **Note:** The first time you update feeds, the sentence-transformers model (~80MB) will be downloaded automatically.
+
+### Enhanced Article Extraction with Tavily (Optional)
+
+For improved article extraction quality, especially from modern websites with JavaScript or dynamic content, you can use the Tavily API:
+
+**Setup:**
+1. Get a free API key from [Tavily.com](https://tavily.com) (1000 requests/month free tier)
+2. Install the Tavily package: `pip install -e ".[tavily]"`
+3. Set your API key in `.env`: `TAVILY_API_KEY=tvly-your-key-here`
+
+**How it works:**
+- The system tries Tavily API first for article extraction
+- Falls back to newspaper3k if Tavily fails or is unavailable
+- Tavily handles modern websites, dynamic content, and some paywalls better
+- Completely optional - the app works without Tavily using newspaper3k
+
+**Benefits:**
+- Higher extraction success rate on modern websites
+- Better content quality and formatting
+- Handles JavaScript-heavy sites
+- No configuration needed if you don't want it
 
 ### Python API
 
