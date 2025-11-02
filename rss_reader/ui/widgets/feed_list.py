@@ -30,13 +30,14 @@ class FeedItem(Static):
     }
     """
     
-    def __init__(self, feed_id: int, feed_name: str, article_count: int, is_all_articles: bool = False, is_recommended: bool = False):
+    def __init__(self, feed_id: int, feed_name: str, article_count: int, is_all_articles: bool = False, is_recommended: bool = False, is_liked: bool = False):
         super().__init__()
         self.feed_id = feed_id
         self.feed_name = feed_name
         self.article_count = article_count
         self.is_all_articles = is_all_articles
         self.is_recommended = is_recommended
+        self.is_liked = is_liked
     
     def render(self) -> str:
         """Render the feed item."""
@@ -48,6 +49,9 @@ class FeedItem(Static):
             if self.article_count == 0:
                 return f"[bold dim]✨ {self.feed_name}[/bold dim] [dim](0)[/dim]"
             return f"[bold]✨ {self.feed_name}[/bold] [dim]({self.article_count})[/dim]"
+        if self.is_liked:
+            # Bold/highlighted for "Liked"
+            return f"[bold]♥ {self.feed_name}[/bold] [dim]({self.article_count})[/dim]"
         return f"{self.feed_name} [dim]({self.article_count})[/dim]"
     
     async def on_click(self) -> None:
@@ -133,6 +137,11 @@ class FeedList(Vertical):
             recommended_item = FeedItem(-1, "Recommended", rec_count, is_recommended=True)
             items.append(recommended_item)
             logger.info(f"load_feeds: Added 'Recommended' with {rec_count} recommendations")
+            
+            # Add "Liked" feed
+            liked_item = FeedItem(-2, "Liked", liked_count, is_liked=True)
+            items.append(liked_item)
+            logger.info(f"load_feeds: Added 'Liked' with {liked_count} liked articles")
             
             if not feeds:
                 # Still show virtual feeds even with no real feeds

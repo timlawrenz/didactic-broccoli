@@ -61,6 +61,22 @@ class ArticleList(Static):
                     f"[dim]Error: {e}[/dim]"
                 )))
                 return
+        elif feed_id == -2:
+            # Liked feed
+            liked_articles = get_liked_articles()
+            if not liked_articles:
+                listview.append(ListItem(Label(
+                    "[dim]No liked articles yet[/dim]\n\n"
+                    "[dim]Press 'l' while reading articles to save them here.[/dim]\n"
+                    "[dim]Liked articles are used for personalized recommendations.[/dim]"
+                )))
+                return
+            
+            # Sort by most recently liked (newest first)
+            # Note: get_liked_articles() should already return liked_date
+            articles = sorted(liked_articles, 
+                             key=lambda x: x.get('liked_date', ''), 
+                             reverse=True)
         else:
             articles = get_articles_by_feed(feed_id, limit=100)
         
@@ -79,8 +95,8 @@ class ArticleList(Static):
             if article['published_date']:
                 date_str = f" [dim]{article['published_date'][:10]}[/dim]"
             
-            # Add feed name prefix for "All Articles" and "Recommended" views
-            if (feed_id == 0 or feed_id == -1) and 'feed_name' in article:
+            # Add feed name prefix for "All Articles", "Recommended", and "Liked" views
+            if (feed_id == 0 or feed_id == -1 or feed_id == -2) and 'feed_name' in article:
                 title = f"[cyan]{article['feed_name']}[/cyan] {article['title']}"
             else:
                 title = article['title']

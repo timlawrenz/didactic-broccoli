@@ -69,9 +69,17 @@ rss-reader
 **Browsing Articles:**
 - The app starts with **"All Articles"** view showing posts from all feeds chronologically
 - Below that is **"Recommended"** - your personalized ML-powered article suggestions
+- Below that is **"Liked"** - all your liked articles in one place for easy management
 - Click on any feed name in the left sidebar to switch views
-- In "All Articles" and "Recommended" views, each article is prefixed with its feed name
+- In "All Articles", "Recommended", and "Liked" views, each article is prefixed with its feed name
 - Navigate with arrow keys or vim-style `j`/`k` keys
+
+**Managing Liked Articles:**
+- Press `l` while reading any article to like (or unlike) it
+- Click **"Liked"** in the sidebar to see all your liked articles
+- Articles are sorted by most recently liked (newest first)
+- Press `l` again to unlike directly from the Liked view
+- Liked articles are used for personalized recommendations
 
 **Keyboard Shortcuts:**
 - `q` - Quit application

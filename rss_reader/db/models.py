@@ -242,13 +242,15 @@ def get_liked_articles(user_id: int = 1, limit: int = 100) -> list[sqlite3.Row]:
         limit: Maximum number of articles to return
         
     Returns:
-        List of article rows
+        List of article rows with feed information and liked date
     """
     conn = get_connection()
     cursor = conn.execute(
         """
-        SELECT a.* FROM articles a
+        SELECT a.*, f.name as feed_name, ul.liked_at as liked_date
+        FROM articles a
         INNER JOIN user_likes ul ON a.article_id = ul.article_id
+        INNER JOIN feeds f ON a.feed_id = f.feed_id
         WHERE ul.user_id = ?
         ORDER BY ul.liked_at DESC
         LIMIT ?
